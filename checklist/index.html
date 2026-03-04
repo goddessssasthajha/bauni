@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Mathematics checklist🌸</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500&display=swap');
+
+:root {
+  --bg1: #ffd6e8;
+  --bg2: #e0c3fc;
+  --card: rgba(255,255,255,0.6);
+  --accent: #ff5fa2;
+  --text: #1e293b;
+}
+
+body.dark {
+  --bg1: #0f172a;
+  --bg2: #020617;
+  --card: rgba(30,41,59,0.85);
+  --accent: #f472b6;
+  --text: #f8fafc;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(135deg, var(--bg1), var(--bg2));
+  min-height: 100vh;
+  margin: 0;
+  color: var(--text);
+  overflow: hidden;
+}
+
+/* 🌸 FLOATING FLOWERS */
+.flower {
+  position: absolute;
+  font-size: 22px;
+  opacity: 0;
+  animation: floatUp linear infinite;
+  pointer-events: none;
+}
+
+@keyframes floatUp {
+  0% { transform: translateY(120vh) rotate(0deg); opacity: 0; }
+  10% { opacity: 0.7; }
+  100% { transform: translateY(-150px) rotate(360deg); opacity: 0; }
+}
+
+/* LAYOUT */
+.wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 22px;
+  height: 100vh;
+  position: relative;
+  z-index: 2;
+}
+
+/* APP */
+.app {
+  width: 380px;
+  background: var(--card);
+  backdrop-filter: blur(14px);
+  border-radius: 26px;
+  padding: 22px;
+  box-shadow: 0 30px 60px rgba(0,0,0,0.25);
+}
+
+/* THEME PANEL */
+.theme-panel {
+  background: var(--card);
+  backdrop-filter: blur(12px);
+  padding: 14px;
+  border-radius: 20px;
+  width: 140px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+}
+
+.theme-panel h4 {
+  margin: 0 0 10px;
+  font-size: 13px;
+  text-align: center;
+  color: var(--accent);
+}
+
+.theme-btn {
+  width: 100%;
+  margin-bottom: 8px;
+  border-radius: 12px;
+  border: none;
+  padding: 8px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+/* GOALS */
+.goal {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255,255,255,0.85);
+  padding: 12px;
+  border-radius: 18px;
+  margin: 12px 0;
+  animation: pop 0.35s ease;
+}
+
+body.dark .goal {
+  background: rgba(51,65,85,0.9);
+}
+
+.goal.done {
+  opacity: 0.6;
+  text-decoration: line-through;
+}
+
+.goal span {
+  flex: 1;
+  outline: none;
+  font-size: 14px;
+}
+
+input[type="checkbox"] {
+  accent-color: var(--accent);
+}
+
+/* ❌ DELETE BUTTON */
+.delete-btn {
+  background: transparent;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: 0.2s;
+}
+
+.delete-btn:hover {
+  opacity: 1;
+  transform: scale(1.2);
+}
+
+/* BUTTON */
+.add-btn {
+  width: 100%;
+  padding: 12px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #ff7eb3, #ff758c);
+  color: white;
+  margin-top: 10px;
+  font-size: 15px;
+  border: none;
+  cursor: pointer;
+}
+
+@keyframes pop {
+  from { transform: scale(0.85); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+/* 📱 RESPONSIVE */
+@media (max-width: 600px) {
+  .wrapper {
+    flex-direction: column;
+  }
+  .theme-panel {
+    width: 90%;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<!-- 🌸 FLOWERS -->
+<script>
+for (let i = 0; i < 20; i++) {
+  const f = document.createElement("div");
+  f.className = "flower";
+  f.innerText = ["🌸","🌼","🌺"][Math.floor(Math.random()*3)];
+  f.style.left = Math.random()*100 + "vw";
+  f.style.animationDuration = 8 + Math.random()*6 + "s";
+  f.style.animationDelay = Math.random()*8 + "s";
+  document.body.appendChild(f);
+}
+</script>
+
+<div class="wrapper">
+  <div class="app">
+    <h2>✨ Checklist ✨</h2>
+    <div id="list"></div>
+    <button class="add-btn" onclick="addGoal()">➕ add new task</button>
+  </div>
+
+  <div class="theme-panel">
+    <h4>🎨 Themes</h4>
+    <button class="theme-btn" onclick="setTheme('pink')">💗 Pink</button>
+    <button class="theme-btn" onclick="setTheme('lavender')">💜 Lavender</button>
+    <button class="theme-btn" onclick="setTheme('peach')">🍑 Peach</button>
+    <button class="theme-btn" onclick="setTheme('dark')">🌙 Dark</button>
+  </div>
+</div>
+
+<audio id="tickSound">
+  <source src="Voicy_good girl.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+let goals = JSON.parse(localStorage.getItem("goals")) || [
+  { text: "", done: false },
+  { text: "", done: false }
+];
+
+const list = document.getElementById("list");
+const sound = document.getElementById("tickSound");
+
+function save() {
+  localStorage.setItem("goals", JSON.stringify(goals));
+}
+
+function render() {
+  list.innerHTML = "";
+  goals.forEach((g, i) => {
+    const div = document.createElement("div");
+    div.className = "goal" + (g.done ? " done" : "");
+    div.innerHTML = `
+      <input type="checkbox" ${g.done ? "checked" : ""}>
+      <span contenteditable="true">${g.text}</span>
+      <button class="delete-btn">✕</button>
+    `;
+
+    div.querySelector("input").onchange = () => {
+      goals[i].done = !g.done;
+      sound.play();
+      save();
+      render();
+    };
+
+    div.querySelector("span").oninput = e => {
+      goals[i].text = e.target.innerText;
+      save();
+    };
+
+    div.querySelector(".delete-btn").onclick = () => {
+      goals.splice(i, 1);
+      save();
+      render();
+    };
+
+    list.appendChild(div);
+  });
+}
+
+function addGoal() {
+  goals.push({ text: "bauni ka new task", done: false });
+  save();
+  render();
+}
+
+function setTheme(type) {
+  document.body.classList.remove("dark");
+
+  if (type === "pink") {
+    setVars("#ffd6e8","#e0c3fc","#ff5fa2");
+  } else if (type === "lavender") {
+    setVars("#e9d5ff","#c7d2fe","#a855f7");
+  } else if (type === "peach") {
+    setVars("#ffedd5","#fecaca","#fb7185");
+  } else if (type === "dark") {
+    document.body.classList.add("dark");
+  }
+}
+
+function setVars(a,b,c){
+  document.documentElement.style.setProperty("--bg1", a);
+  document.documentElement.style.setProperty("--bg2", b);
+  document.documentElement.style.setProperty("--accent", c);
+}
+
+render();
+</script>
+
+</body>
+</html>
